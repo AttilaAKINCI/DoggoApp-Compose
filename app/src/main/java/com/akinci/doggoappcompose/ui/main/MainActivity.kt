@@ -1,6 +1,7 @@
 package com.akinci.doggoappcompose.ui.main
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
@@ -8,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.akinci.doggoappcompose.common.base.BaseActivity
 import com.akinci.doggoappcompose.ui.components.NetworkDependentScreen
 import com.akinci.doggoappcompose.ui.feaute.dashboard.DashboardScreenBody
 import com.akinci.doggoappcompose.ui.feaute.detail.DetailScreenBody
@@ -20,7 +20,7 @@ import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity: BaseActivity() {
+class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
