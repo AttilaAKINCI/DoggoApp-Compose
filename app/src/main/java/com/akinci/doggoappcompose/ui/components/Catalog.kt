@@ -2,6 +2,7 @@ package com.akinci.doggoappcompose.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.common.network.NetworkState
 import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
 
@@ -12,21 +13,22 @@ import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
  *
  * **/
 
-@Preview(showBackground = true)
-@Composable
-fun Catalog_PageNavigator() {
-    DoggoAppComposeTheme {
-        PageNavigator(onClick = { })
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun Catalog_PageNavigator() {
+//    DoggoAppComposeTheme {
+//        PageNavigator(onClick = { })
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun Catalog_OfflineDialog() {
+//    DoggoAppComposeTheme {
+//        OfflineDialog(
+//            networkState = NetworkState.NotConnected, // NetworkState.Connected, NetworkState.None
+//            onRetry = { }
+//        )
+//    }
+//}
 
-@Preview(showBackground = true)
-@Composable
-fun Catalog_OfflineDialog() {
-    DoggoAppComposeTheme {
-        OfflineDialog(
-            networkState = NetworkState.NotConnected, // NetworkState.Connected, NetworkState.None
-            onRetry = { }
-        )
-    }
-}

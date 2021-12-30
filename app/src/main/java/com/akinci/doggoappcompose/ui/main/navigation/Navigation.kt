@@ -7,5 +7,19 @@ package com.akinci.doggoappcompose.ui.main.navigation
 sealed class Navigation(val route: String){
     object Splash: Navigation("splash")
     object Dashboard: Navigation("dashboard")
-    object Detail: Navigation("detail")
+    object DetailWithBreed: Navigation("detail/{breed}") {
+        override fun createRoute(args: Map<String, String>?): String {
+            return route
+                .replace("{breed}", args?.get("breed") ?: "")
+        }
+    }
+    object DetailWithBreedAndSubBreed: Navigation("detail/{breed}/{subBreed}") {
+        override fun createRoute(args: Map<String, String>?): String {
+            return route
+                .replace("{breed}", args?.get("breed") ?: "")
+                .replace("{subBreed}", args?.get("subBreed") ?: "")
+        }
+    }
+
+    open fun createRoute(args: Map<String, String>?): String{ return route }
 }

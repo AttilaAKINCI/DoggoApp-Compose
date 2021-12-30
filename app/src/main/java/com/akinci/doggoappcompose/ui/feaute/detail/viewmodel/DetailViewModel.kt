@@ -1,5 +1,8 @@
 package com.akinci.doggoappcompose.ui.feaute.detail.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akinci.doggoappcompose.common.coroutine.CoroutineContextProvider
@@ -9,6 +12,9 @@ import com.akinci.doggoappcompose.common.helper.state.UIState
 import com.akinci.doggoappcompose.data.local.dao.ContentDao
 import com.akinci.doggoappcompose.data.mapper.convertToDoggoContentListEntity
 import com.akinci.doggoappcompose.data.repository.DoggoRepository
+import com.akinci.doggoappcompose.ui.feaute.dashboard.data.Breed
+import com.akinci.doggoappcompose.ui.feaute.detail.data.Content
+import com.akinci.doggoappcompose.ui.feaute.detail.helper.DoggoNameProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +30,11 @@ class DetailViewModel @Inject constructor(
     private val doggoRepository: DoggoRepository,
     private val contentDao: ContentDao
 ): ViewModel() {
+
+    // pass data to composable ui via states
+    var breedImageListState by mutableStateOf(listOf<Content>())
+        private set
+
 
     /** Fragments are driven with states **/
     private var _breedImageListData = MutableStateFlow<ListState<List<String>>>(ListState.None)
@@ -41,16 +52,25 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch(coroutineContext.IO) {
             doggoRepository.getDoggoContent(breed = breed, subBreed = subBreed, count = count).collect { networkResponse ->
                 when(networkResponse){
-                    is NetworkResponse.Loading -> { _breedImageListData.emit(ListState.OnLoading) }
-                    is NetworkResponse.Error -> { _uiState.emit(UIState.OnServiceError) }
+                    is NetworkResponse.Loading -> {
+                        //_breedImageListData.emit(ListState.OnLoading)
+                    }
+                    is NetworkResponse.Error -> {
+                    //    _uiState.emit(UIState.OnServiceError)
+                    }
                     is NetworkResponse.Success -> {
-                        delay(3000L) // in order to simulate network delay. show shimmer
+                       // delay(3000L) // in order to simulate network delay. show shimmer
 
-                        networkResponse.data?.message?.also {
+                        networkResponse.data?.message?.let {
                             // saves fetched data to room db
                             contentDao.insertContent(contentList = it.convertToDoggoContentListEntity(breed = breed, subBreed = subBreed))
-                        }.apply {
-                            _breedImageListData.emit(ListState.OnData(this))
+                            // _breedImageListData.emit(ListState.OnData(this))
+                            breedImageListState = it.map { imageUrl ->
+                                Content(
+                                    imageUrl = imageUrl,
+                                    dogName = DoggoNameProvider.getRandomName()
+                                )
+                            }
                         }
                     }
                 }

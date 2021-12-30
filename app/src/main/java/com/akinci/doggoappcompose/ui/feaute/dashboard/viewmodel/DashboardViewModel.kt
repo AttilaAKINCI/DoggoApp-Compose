@@ -1,12 +1,15 @@
 package com.akinci.doggoappcompose.ui.feaute.dashboard.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akinci.doggoappcompose.common.coroutine.CoroutineContextProvider
-import com.akinci.doggoappcompose.common.network.NetworkResponse
 import com.akinci.doggoappcompose.common.helper.state.ListState
-import com.akinci.doggoappcompose.common.helper.state.UIState
 import com.akinci.doggoappcompose.common.network.NetworkChecker
+import com.akinci.doggoappcompose.common.network.NetworkResponse
 import com.akinci.doggoappcompose.data.local.dao.BreedDao
 import com.akinci.doggoappcompose.data.local.dao.SubBreedDao
 import com.akinci.doggoappcompose.data.mapper.convertToBreedListEntity
@@ -30,6 +33,20 @@ class DashboardViewModel @Inject constructor(
     val networkChecker: NetworkChecker
 ): ViewModel() {
 
+    // pass data to composable ui via states
+    var breedListState by mutableStateOf(listOf<Breed>())
+        private set
+
+    var subBreedListState by mutableStateOf(listOf<Breed>())
+        private set
+
+    init {
+        Timber.d("DashboardViewModel created..")
+        getBreedList()
+    }
+
+
+
     var firstLoading = true
 
     var selectedBreed: Breed? = null
@@ -49,12 +66,10 @@ class DashboardViewModel @Inject constructor(
     var continueButtonState: StateFlow<Boolean> = _continueButtonState
 
     /** works like send and forget **/
-    private var _uiState = MutableStateFlow<UIState>(UIState.None)
-    var uiState: StateFlow<UIState> = _uiState
+//    private var _uiState = MutableStateFlow<UIState>(UIState.None)
+//    var uiState: StateFlow<UIState> = _uiState
 
-    init {
-        Timber.d("DashboardViewModel created..")
-    }
+
 
     fun selectBreed(breed: Breed){
         viewModelScope.launch(coroutineContext.IO) {
@@ -84,21 +99,26 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun getBreedList() {
-        if(breedList.isEmpty()){
+    private fun getBreedList() {
+        if(breedListState.isEmpty()){
             viewModelScope.launch(coroutineContext.IO) {
                 doggoRepository.getBreedList().collect { networkResponse ->
                     when(networkResponse){
-                        is NetworkResponse.Loading -> { _breedListData.emit(ListState.OnLoading) }
-                        is NetworkResponse.Error -> { _uiState.emit(UIState.OnServiceError) }
+                        is NetworkResponse.Loading -> {
+                           // _breedListData.emit(ListState.OnLoading)
+                        }
+                        is NetworkResponse.Error -> {
+                        //    _uiState.emit(UIState.OnServiceError)
+                        }
                         is NetworkResponse.Success -> {
                             networkResponse.data?.let {
                                 it.message.keys.map { item -> Breed(item) } // service response mapped Breed object
                                     .apply {
-                                        breedList = this
                                         // saves fetched data to room db
                                         breedDao.insertBreed(convertToBreedListEntity())
-                                        _breedListData.emit(ListState.OnData(breedList))
+                                        breedListState = this
+
+                                       // _breedListData.emit(ListState.OnData(breedList))
                                     }
                             }
                         }
@@ -113,7 +133,9 @@ class DashboardViewModel @Inject constructor(
             doggoRepository.getSubBreedList(breed).collect { networkResponse ->
                 when(networkResponse){
                     is NetworkResponse.Loading -> { _subBreedListData.emit(ListState.OnLoading) }
-                    is NetworkResponse.Error -> { _uiState.emit(UIState.OnServiceError) }
+                    is NetworkResponse.Error -> {
+                    //    _uiState.emit(UIState.OnServiceError)
+                    }
                     is NetworkResponse.Success -> {
                         networkResponse.data?.let {
                             it.message.map { item -> Breed(item)}.apply {

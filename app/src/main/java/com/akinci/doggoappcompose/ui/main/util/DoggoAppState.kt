@@ -17,17 +17,19 @@ fun rememberDoggoAppState(
     DoggoAppState(navController)
 }
 
+//  val navController = rememberNavController()
+//  val backstackEntry = navController.currentBackStackEntryAsState()
+//  val currentScreen = MainNavigation.fromRoute(backstackEntry.value?.destination?.route)
+
+
 class DoggoAppState(
     val navController: NavHostController
 ) {
     fun navigateBack() { navController.popBackStack() }
 
-    fun navigate(navigationRoute: Navigation, from: NavBackStackEntry){
+    fun navigate(navigationRoute: Navigation, args: Map<String,String>? = null, from: NavBackStackEntry){
         if (from.lifecycleIsResumed()) {
-            // In order to discard duplicated navigation events, we check the Lifecycle
-            // val encodedUri = Uri.encode(episodeUri)
-            // navController.navigate(Screen.Player.createRoute(encodedUri))
-            navController.navigate(navigationRoute.route)
+            navController.navigate(navigationRoute.createRoute(args))
         }
     }
 }

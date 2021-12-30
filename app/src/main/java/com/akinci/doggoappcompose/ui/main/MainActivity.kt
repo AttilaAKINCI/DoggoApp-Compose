@@ -3,22 +3,26 @@ package com.akinci.doggoappcompose.ui.main
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.akinci.doggoappcompose.ui.components.NetworkDependentScreen
-import com.akinci.doggoappcompose.ui.feaute.dashboard.DashboardScreenBody
-import com.akinci.doggoappcompose.ui.feaute.detail.DetailScreenBody
-import com.akinci.doggoappcompose.ui.feaute.splash.SplashScreenBody
+import com.akinci.doggoappcompose.ui.feaute.dashboard.view.DashboardScreen
+import com.akinci.doggoappcompose.ui.feaute.detail.view.DetailScreen
+import com.akinci.doggoappcompose.ui.feaute.detail.view.DetailScreenArgs
+import com.akinci.doggoappcompose.ui.feaute.splash.view.SplashScreen
 import com.akinci.doggoappcompose.ui.main.navigation.Navigation
 import com.akinci.doggoappcompose.ui.main.util.DoggoAppState
 import com.akinci.doggoappcompose.ui.main.util.rememberDoggoAppState
 import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
+@ExperimentalAnimationApi
 @AndroidEntryPoint
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,23 +33,17 @@ class MainActivity: ComponentActivity() {
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun DoggoApp(
     appState: DoggoAppState = rememberDoggoAppState()
 ){
     DoggoAppComposeTheme {
-        //  val navController = rememberNavController()
-        //  val backstackEntry = navController.currentBackStackEntryAsState()
-        //  val currentScreen = MainNavigation.fromRoute(backstackEntry.value?.destination?.route)
-
-        Scaffold(
-            // TODO fill later
-        ) { innerPadding ->
-            MainNavHost(appState, modifier = Modifier.padding(innerPadding))
-        }
+        MainNavHost(appState)
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun MainNavHost(
     appState: DoggoAppState,
@@ -56,18 +54,53 @@ fun MainNavHost(
         startDestination = Navigation.Splash.route,
         modifier = modifier
     ){
-
         composable(route = Navigation.Splash.route){
-            SplashScreenBody(onClick = { appState.navigate(Navigation.Dashboard, it) })
+            SplashScreen(onTimeout = { appState.navigate(Navigation.Dashboard, from = it) })
         }
         composable(route = Navigation.Dashboard.route){
             /** For a trial Dashboard Screen is marked as "Network Dependent Screen" (NDS) **/
             NetworkDependentScreen(retryAction = { appState.navigateBack() }) {
-                DashboardScreenBody(onClick = { appState.navigate(Navigation.Detail, it) })
+                DashboardScreen(onNavigateToDetail = { selectedBreed, selectedSubBreed ->
+                    if(selectedSubBreed.isNotBlank()){
+                        appState.navigate(
+                            navigationRoute = Navigation.DetailWithBreedAndSubBreed,
+                            args = mapOf(
+                                "breed" to selectedBreed,
+                                "subBreed" to selectedSubBreed
+                            ),
+                            from = it
+                        )
+                    }else{
+                        appState.navigate(
+                            navigationRoute = Navigation.DetailWithBreed,
+                            args = mapOf("breed" to selectedBreed),
+                            from = it
+                        )
+                    }
+                })
             }
         }
-        composable(route = Navigation.Detail.route){
-            DetailScreenBody(onClick = { appState.navigateBack() })
+        composable(
+            route = Navigation.DetailWithBreedAndSubBreed.route,
+            arguments = listOf(
+                navArgument("breed") { type = NavType.StringType },
+                navArgument("subBreed") { type = NavType.StringType },
+            )
+        ){ entry ->
+            DetailScreen(
+                args = DetailScreenArgs(
+                    breedName = entry.arguments?.getString("breed") ?: "",
+                    subBreedName = entry.arguments?.getString("subBreed") ?: "",
+                ),
+                onBackPress = { appState.navigateBack() })
+        }
+        composable(
+            route = Navigation.DetailWithBreed.route,
+            arguments = listOf(navArgument("breed") { type = NavType.StringType })
+        ){ entry ->
+            DetailScreen(
+                args = DetailScreenArgs(breedName = entry.arguments?.getString("breed") ?: ""),
+                onBackPress = { appState.navigateBack() })
         }
     }
 }
