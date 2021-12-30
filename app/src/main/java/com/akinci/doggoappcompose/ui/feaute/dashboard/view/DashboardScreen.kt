@@ -2,10 +2,10 @@ package com.akinci.doggoappcompose.ui.feaute.dashboard.view
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +32,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.ui.components.BreedSelector
 import com.akinci.doggoappcompose.ui.components.DoggoAppBar
-import com.akinci.doggoappcompose.ui.components.PageNavigator
+import com.akinci.doggoappcompose.ui.components.TiledBackground
 import com.akinci.doggoappcompose.ui.feaute.dashboard.viewmodel.DashboardViewModel
 import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
 
@@ -66,10 +68,9 @@ private fun DashboardScreenBody(
         }
     ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        TiledBackground(
+            tiledDrawableId = R.drawable.ic_pattern_bg
+        ){
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -106,11 +107,15 @@ private fun DashboardScreenBody(
                 }
 
                 /** BREED Container **/
+
+                /** BREED Container **/
                 BreedSelector(
                     content = vm.breedListState,
                     headerTitle = stringResource(R.string.breed_list_title),
                     isVisible = vm.breedListState.isNotEmpty()
                 )
+
+                /** BREED Container **/
 
                 /** BREED Container **/
                 BreedSelector(
@@ -121,18 +126,22 @@ private fun DashboardScreenBody(
 
             }
 
-            FloatingActionButton(
-                onClick = { onNavigateToDetail.invoke("boxer", "") },
-                modifier = Modifier
-                    .align(alignment = Alignment.BottomEnd)
-                    .padding(0.dp, 0.dp, 30.dp, 50.dp)
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Icon(
-                    Icons.Filled.KeyboardArrowRight,
-                    "",
-                    modifier = Modifier.scale(1.2f),
-                    tint = colorResource(R.color.white)
-                )
+                FloatingActionButton(
+                    onClick = { onNavigateToDetail.invoke("hound", "afghan") },
+                    modifier = Modifier
+                        .align(alignment = Alignment.BottomEnd)
+                        .padding(0.dp, 0.dp, 30.dp, 50.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.KeyboardArrowRight,
+                        "",
+                        modifier = Modifier.scale(1.2f),
+                        tint = colorResource(R.color.white)
+                    )
+                }
             }
         }
     }

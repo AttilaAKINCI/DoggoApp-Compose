@@ -17,7 +17,7 @@ import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
 import kotlinx.coroutines.delay
 
-private const val SplashWaitTime: Long = 100
+private const val SplashWaitTime: Long = 3000
 
 /**
  * Stateful version of the Podcast player
