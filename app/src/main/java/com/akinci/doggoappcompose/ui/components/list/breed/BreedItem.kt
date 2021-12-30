@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,12 +39,14 @@ fun BreedItem(
                 BorderStroke(1.dp, colorResource(R.color.card_border)),
                 RoundedCornerShape(18.dp)
             )
-            .background(color = if(item.selected){
-                colorResource(R.color.teal_200)
-            }else{
-                colorResource(R.color.breed_row_bg)
-            })
-            .clickable (onClick = { onItemClick.invoke(item.name) }),
+            .background(
+                color = if (item.selected) {
+                    colorResource(R.color.teal_200)
+                } else {
+                    colorResource(R.color.breed_row_bg)
+                }
+            )
+            .clickable(onClick = { onItemClick.invoke(item.name) }),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -55,9 +58,7 @@ fun BreedItem(
             }else{
                 colorResource(R.color.card_border)
              },
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
+            style = MaterialTheme.typography.body1
         )
     }
 }

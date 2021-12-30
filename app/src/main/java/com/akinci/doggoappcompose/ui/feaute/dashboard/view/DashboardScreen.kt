@@ -100,9 +100,7 @@ private fun DashboardScreenBody(
                     Text(
                         text = stringResource(R.string.dashboard_welcome_info_text),
                         modifier = Modifier.padding(0.dp, 0.dp, 5.dp,0.dp),
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
+                        style = MaterialTheme.typography.body1
                     )
                 }
 

@@ -16,10 +16,15 @@ val fonts = FontFamily(
 
 val Typography = Typography(
     body1 = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 14.sp
     ),
+    h2 = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.Normal,
+        fontSize = 24.sp
+    )
     /* Other default text styles to override
     button = TextStyle(
         fontFamily = FontFamily.Default,
@@ -32,9 +37,4 @@ val Typography = Typography(
         fontSize = 12.sp
     )
     */
-    h2 = TextStyle(
-        fontFamily = fonts,
-        fontWeight = FontWeight.Normal,
-        fontSize = 24.sp
-    )
 )

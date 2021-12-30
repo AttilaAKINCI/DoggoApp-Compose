@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -61,9 +62,7 @@ fun BreedSelector(
                 Text(
                     text = headerTitle,
                     modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 10.dp),
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
+                    style = MaterialTheme.typography.body1
                 )
             }
 
