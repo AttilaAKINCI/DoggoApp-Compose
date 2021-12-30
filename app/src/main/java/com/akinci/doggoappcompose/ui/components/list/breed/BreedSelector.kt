@@ -1,15 +1,13 @@
-package com.akinci.doggoappcompose.ui.components
+package com.akinci.doggoappcompose.ui.components.list.breed
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -18,13 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.akinci.doggoappcompose.R
-import com.akinci.doggoappcompose.ui.components.list.StaggeredHorizontalGrid
-import com.akinci.doggoappcompose.ui.components.list.breed.BreedItem
 import com.akinci.doggoappcompose.ui.feaute.dashboard.data.Breed
 import kotlinx.coroutines.launch
 
@@ -34,7 +27,8 @@ import kotlinx.coroutines.launch
 fun BreedSelector(
     content: List<Breed>,
     headerTitle: String,
-    isVisible: Boolean
+    isVisible: Boolean,
+    onItemSelected: (String)->Unit
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -42,7 +36,7 @@ fun BreedSelector(
             initialAlpha = 0f
         ),
         exit = fadeOut(
-            targetAlpha = 1f
+            targetAlpha = 0f
         )
     ) {
         Column(
@@ -80,6 +74,7 @@ fun BreedSelector(
                         item = item,
                         onItemClick = { selectedItemName ->
                             scope.launch {
+                                onItemSelected.invoke(selectedItemName) // inform DashboardScreen for selected Item
                                 myList.clear()
                                 myList.addAll(
                                     content.map { item ->

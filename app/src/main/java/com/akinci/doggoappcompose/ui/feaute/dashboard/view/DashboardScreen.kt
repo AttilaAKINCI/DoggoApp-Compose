@@ -2,7 +2,6 @@ package com.akinci.doggoappcompose.ui.feaute.dashboard.view
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,21 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.akinci.doggoappcompose.R
-import com.akinci.doggoappcompose.ui.components.BreedSelector
+import com.akinci.doggoappcompose.ui.components.list.breed.BreedSelector
 import com.akinci.doggoappcompose.ui.components.DoggoAppBar
 import com.akinci.doggoappcompose.ui.components.TiledBackground
 import com.akinci.doggoappcompose.ui.feaute.dashboard.viewmodel.DashboardViewModel
@@ -110,7 +104,8 @@ private fun DashboardScreenBody(
                 BreedSelector(
                     content = vm.breedListState,
                     headerTitle = stringResource(R.string.breed_list_title),
-                    isVisible = vm.breedListState.isNotEmpty()
+                    isVisible = vm.breedListState.isNotEmpty(),
+                    onItemSelected = { breedName -> vm.selectBreed(breedName) }
                 )
 
                 /** BREED Container **/
@@ -119,16 +114,16 @@ private fun DashboardScreenBody(
                 BreedSelector(
                     content = vm.subBreedListState,
                     headerTitle = stringResource(R.string.sub_breed_list_title),
-                    isVisible = vm.subBreedListState.isNotEmpty()
+                    isVisible = vm.subBreedListState.isNotEmpty(),
+                    onItemSelected = { breedName -> vm.selectSubBreed(breedName) }
                 )
-
             }
 
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
                 FloatingActionButton(
-                    onClick = { onNavigateToDetail.invoke("hound", "afghan") },
+                    onClick = { onNavigateToDetail.invoke(vm.selectedBreedName, vm.selectedSubBreedName) },
                     modifier = Modifier
                         .align(alignment = Alignment.BottomEnd)
                         .padding(0.dp, 0.dp, 30.dp, 50.dp)
