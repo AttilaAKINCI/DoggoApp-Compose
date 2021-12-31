@@ -12,20 +12,23 @@ import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
 
 @Composable
 fun OfflineDialog(
+    isVisible: Boolean = true,
     networkState: NetworkState = NetworkState.None,
     onRetry: () -> Unit
 ) {
-    if(networkState is NetworkState.NotConnected){
-        AlertDialog(
-            onDismissRequest = {},
-            title = { Text(text = stringResource(R.string.connection_error_title)) },
-            text = { Text(text = stringResource(R.string.connection_error_message)) },
-            confirmButton = {
-                TextButton(onClick = onRetry) {
-                    Text(stringResource(R.string.retry_label))
+    if(isVisible){
+        if(networkState is NetworkState.NotConnected){
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(text = stringResource(R.string.connection_error_title)) },
+                text = { Text(text = stringResource(R.string.connection_error_message)) },
+                confirmButton = {
+                    TextButton(onClick = onRetry) {
+                        Text(stringResource(R.string.ok_label))
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
 

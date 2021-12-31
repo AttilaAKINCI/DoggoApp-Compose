@@ -40,6 +40,14 @@ class DetailViewModel @Inject constructor(
     private val fragmentArgBreed by lazy { savedStateHandle.get("breed") ?: "" }
     private val fragmentArgSubBreed by lazy { savedStateHandle.get("subBreed") ?: "" }
 
+    /** Network warning popup should seen once **/
+    var isNetworkWarningDialogVisible by mutableStateOf(true)
+        private set
+
+    fun networkWarningSeen(){
+        isNetworkWarningDialogVisible = false
+    }
+
     init {
         Timber.d("DetailViewModel created..")
 

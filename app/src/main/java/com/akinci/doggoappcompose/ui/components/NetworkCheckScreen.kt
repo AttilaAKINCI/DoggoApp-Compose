@@ -10,16 +10,20 @@ import com.akinci.doggoappcompose.common.network.NetworkState
 import com.akinci.doggoappcompose.common.network.NetworkStateViewModel
 
 @Composable
-fun NetworkDependentScreen(
+fun NetworkCheckScreen(
     modifier: Modifier = Modifier,
-    retryAction: () -> Unit,
+    isVisible: Boolean = true,
+    buttonAction: () -> Unit,
     networkStateViewModel: NetworkStateViewModel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
     val networkState by networkStateViewModel.networkState.collectAsState(initial = NetworkState.None)
 
     Box(modifier = modifier){
-        OfflineDialog(networkState = networkState) { retryAction() }
+        OfflineDialog(
+            isVisible = isVisible,
+            networkState = networkState
+        ) { buttonAction() }
         content()
     }
 }

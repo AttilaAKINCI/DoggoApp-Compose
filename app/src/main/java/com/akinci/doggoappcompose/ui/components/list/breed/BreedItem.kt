@@ -33,7 +33,7 @@ fun BreedItem(
 
     Column(
         modifier = Modifier
-            .padding(20.dp, 10.dp, 20.dp, 10.dp)
+            .padding(5.dp, 5.dp, 5.dp, 5.dp)
             .clip(RoundedCornerShape(18.dp))
             .border(
                 BorderStroke(1.dp, colorResource(R.color.card_border)),

@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.akinci.doggoappcompose.ui.components.NetworkDependentScreen
 import com.akinci.doggoappcompose.ui.feaute.dashboard.view.DashboardScreen
 import com.akinci.doggoappcompose.ui.feaute.detail.view.DetailScreen
 import com.akinci.doggoappcompose.ui.feaute.detail.view.DetailScreenArgs
@@ -58,27 +57,24 @@ fun MainNavHost(
             SplashScreen(onTimeout = { appState.navigate(Navigation.Dashboard, from = it) })
         }
         composable(route = Navigation.Dashboard.route){
-            /** For a trial Dashboard Screen is marked as "Network Dependent Screen" (NDS) **/
-            NetworkDependentScreen(retryAction = { appState.navigateBack() }) {
-                DashboardScreen(onNavigateToDetail = { selectedBreed, selectedSubBreed ->
-                    if(selectedSubBreed.isNotBlank()){
-                        appState.navigate(
-                            navigationRoute = Navigation.DetailWithBreedAndSubBreed,
-                            args = mapOf(
-                                "breed" to selectedBreed,
-                                "subBreed" to selectedSubBreed
-                            ),
-                            from = it
-                        )
-                    }else{
-                        appState.navigate(
-                            navigationRoute = Navigation.DetailWithBreed,
-                            args = mapOf("breed" to selectedBreed),
-                            from = it
-                        )
-                    }
-                })
-            }
+            DashboardScreen(onNavigateToDetail = { selectedBreed, selectedSubBreed ->
+                if(selectedSubBreed.isNotBlank()){
+                    appState.navigate(
+                        navigationRoute = Navigation.DetailWithBreedAndSubBreed,
+                        args = mapOf(
+                            "breed" to selectedBreed,
+                            "subBreed" to selectedSubBreed
+                        ),
+                        from = it
+                    )
+                }else{
+                    appState.navigate(
+                        navigationRoute = Navigation.DetailWithBreed,
+                        args = mapOf("breed" to selectedBreed),
+                        from = it
+                    )
+                }
+            })
         }
         composable(
             route = Navigation.DetailWithBreedAndSubBreed.route,

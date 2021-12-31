@@ -1,5 +1,6 @@
 package com.akinci.doggoappcompose.ui.feaute.dashboard.view
 
+import android.content.res.Resources
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,9 +28,11 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.ui.components.list.breed.BreedSelector
 import com.akinci.doggoappcompose.ui.components.DoggoAppBar
+import com.akinci.doggoappcompose.ui.components.NetworkCheckScreen
 import com.akinci.doggoappcompose.ui.components.TiledBackground
 import com.akinci.doggoappcompose.ui.feaute.dashboard.viewmodel.DashboardViewModel
 import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
+import kotlinx.coroutines.launch
 
 /**
  * Stateful version of the Podcast player
@@ -54,7 +58,11 @@ private fun DashboardScreenBody(
     vm: DashboardViewModel,
     onNavigateToDetail: (String, String) -> Unit
 ) {
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             DoggoAppBar(
                 title = stringResource(R.string.title_dashboard)
@@ -62,78 +70,96 @@ private fun DashboardScreenBody(
         }
     ) {
 
-        TiledBackground(
-            tiledDrawableId = R.drawable.ic_pattern_bg
-        ){
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
+        /** Dashboard Screen is marked as "Network Dependent Screen" (NDS) **/
+        NetworkCheckScreen(
+            isVisible = vm.isNetworkWarningDialogVisible,
+            buttonAction = {
+                scope.launch {
+                    vm.networkWarningSeen()
+                }
+            }
+        ) {
+            TiledBackground(
+                tiledDrawableId = R.drawable.ic_pattern_bg
             ){
-                Row(
+                Column(
                     modifier = Modifier
-                        .padding(20.dp, 20.dp, 20.dp, 10.dp)
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .border(
-                            BorderStroke(1.dp, colorResource(R.color.card_border)),
-                            RoundedCornerShape(10.dp)
-                        )
-                        .background(color = colorResource(R.color.teal_200_90)),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.doggo))
-                    LottieAnimation(
-                        composition,
+                        .fillMaxSize()
+                ){
+                    Row(
                         modifier = Modifier
-                            .width(100.dp)
-                            .height(100.dp),
-                        iterations = Int.MAX_VALUE
+                            .padding(20.dp, 20.dp, 20.dp, 10.dp)
+                            .height(100.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .border(
+                                BorderStroke(1.dp, colorResource(R.color.card_border)),
+                                RoundedCornerShape(10.dp)
+                            )
+                            .background(color = colorResource(R.color.teal_200_90)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.doggo))
+                        LottieAnimation(
+                            composition,
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(100.dp),
+                            iterations = Int.MAX_VALUE
+                        )
+
+                        Text(
+                            text = stringResource(R.string.dashboard_welcome_info_text),
+                            modifier = Modifier.padding(0.dp, 0.dp, 5.dp,0.dp),
+                            style = MaterialTheme.typography.body1
+                        )
+                    }
+
+                    /** BREED Container **/
+                    BreedSelector(
+                        content = vm.breedListState,
+                        headerTitle = stringResource(R.string.breed_list_title),
+                        isVisible = vm.breedListState.isNotEmpty(),
+                        onItemSelected = { breedName -> vm.selectBreed(breedName) }
                     )
 
-                    Text(
-                        text = stringResource(R.string.dashboard_welcome_info_text),
-                        modifier = Modifier.padding(0.dp, 0.dp, 5.dp,0.dp),
-                        style = MaterialTheme.typography.body1
+                    /** BREED Container **/
+                    BreedSelector(
+                        content = vm.subBreedListState,
+                        headerTitle = stringResource(R.string.sub_breed_list_title),
+                        isVisible = vm.subBreedListState.isNotEmpty(),
+                        onItemSelected = { breedName -> vm.selectSubBreed(breedName) },
+                        rowCount = 1
                     )
                 }
 
-                /** BREED Container **/
-
-                /** BREED Container **/
-                BreedSelector(
-                    content = vm.breedListState,
-                    headerTitle = stringResource(R.string.breed_list_title),
-                    isVisible = vm.breedListState.isNotEmpty(),
-                    onItemSelected = { breedName -> vm.selectBreed(breedName) }
-                )
-
-                /** BREED Container **/
-
-                /** BREED Container **/
-                BreedSelector(
-                    content = vm.subBreedListState,
-                    headerTitle = stringResource(R.string.sub_breed_list_title),
-                    isVisible = vm.subBreedListState.isNotEmpty(),
-                    onItemSelected = { breedName -> vm.selectSubBreed(breedName) }
-                )
-            }
-
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                FloatingActionButton(
-                    onClick = { onNavigateToDetail.invoke(vm.selectedBreedName, vm.selectedSubBreedName) },
-                    modifier = Modifier
-                        .align(alignment = Alignment.BottomEnd)
-                        .padding(0.dp, 0.dp, 30.dp, 50.dp)
+                Box(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Icon(
-                        Icons.Filled.KeyboardArrowRight,
-                        "",
-                        modifier = Modifier.scale(1.2f),
-                        tint = colorResource(R.color.white)
-                    )
+                    FloatingActionButton(
+                        onClick = {
+                            scope.launch {
+                                if(vm.validate()){
+                                    onNavigateToDetail.invoke(vm.selectedBreedName, vm.selectedSubBreedName)
+                                }else{
+                                    scaffoldState.snackbarHostState.showSnackbar(
+                                        message = "Please choose a breed & sub-breed first",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .align(alignment = Alignment.BottomEnd)
+                            .padding(0.dp, 0.dp, 30.dp, 50.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.KeyboardArrowRight,
+                            "",
+                            modifier = Modifier.scale(1.2f),
+                            tint = colorResource(R.color.white)
+                        )
+                    }
                 }
             }
         }

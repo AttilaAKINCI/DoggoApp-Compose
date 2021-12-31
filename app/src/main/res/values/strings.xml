@@ -14,7 +14,6 @@
     <!--  Dashboard Fragment   -->
     <string name="title_dashboard">Which breed is your favorite?</string>
     <string name="dashboard_welcome_info_text">Welcome to Doggo :) You can select a breed and a sub breed in order to take a look at lovely doggos </string>
-    <string name="dashboard_offline_mode_info_text">OFFLINE MODE: We have detect that you haven\'t got proper internet connection. Only locally saved data will be shown </string>
     <string name="choose_breed_msg">Please choose a breed &amp; sub-breed first</string>
     <string name="breed_list_title">BREEDS</string>
     <string name="sub_breed_list_title">SUB BREEDS</string>
@@ -26,9 +25,9 @@
 
     <!-- COMPONENTS -->
     <!-- Offline Dialog -->
-    <string name="connection_error_title">Network Connection Error</string>
-    <string name="connection_error_message">This page requires network connection and we detect that your connection is lost. Please try again  </string>
-    <string name="retry_label">Retry</string>
+    <string name="connection_error_title">OFFLINE MODE</string>
+    <string name="connection_error_message">We have detect that you haven\'t got proper internet connection. Only locally saved data will be shown </string>
+    <string name="ok_label">OK</string>
 
     <!-- Page Navigator -->
     <string name="welcome_message">....Welcome....</string>

@@ -9,10 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,11 +25,13 @@ import coil.compose.rememberImagePainter
 import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.common.helper.allCaps
 import com.akinci.doggoappcompose.ui.components.DoggoAppBar
+import com.akinci.doggoappcompose.ui.components.NetworkCheckScreen
 import com.akinci.doggoappcompose.ui.components.TiledBackground
 import com.akinci.doggoappcompose.ui.components.list.header.ListHeader
 import com.akinci.doggoappcompose.ui.feaute.detail.data.Content
 import com.akinci.doggoappcompose.ui.feaute.detail.viewmodel.DetailViewModel
 import com.akinci.doggoappcompose.ui.theme.DoggoAppComposeTheme
+import kotlinx.coroutines.launch
 
 /**
  * Stateful version of the Podcast player
@@ -59,6 +58,8 @@ fun DetailScreenBody(
     vm: DetailViewModel,
     onBackPress : ()->Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             DoggoAppBar(
@@ -69,73 +70,82 @@ fun DetailScreenBody(
         }
     ) {
 
-        TiledBackground(
-            tiledDrawableId = R.drawable.ic_pattern_bg
-        ){
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
+        /** Dashboard Screen is marked as "Network Dependent Screen" (NDS) **/
+        NetworkCheckScreen(
+            isVisible = vm.isNetworkWarningDialogVisible,
+            buttonAction = {
+                scope.launch {
+                    vm.networkWarningSeen()
+                }
+            }
+        ) {
+            TiledBackground(
+                tiledDrawableId = R.drawable.ic_pattern_bg
+            ){
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
 
-                /** Header of doggo image list **/
-                ListHeader(
-                    headerTitle = if(args.subBreedName.isNotBlank()) {
-                        stringResource(R.string.detail_title_long, args.breedName, args.subBreedName).allCaps()
-                    }else{
-                        stringResource(R.string.detail_title_short, args.breedName).allCaps()
-                    }
-                )
+                    /** Header of doggo image list **/
+                    ListHeader(
+                        headerTitle = if(args.subBreedName.isNotBlank()) {
+                            stringResource(R.string.detail_title_long, args.breedName, args.subBreedName).allCaps()
+                        }else{
+                            stringResource(R.string.detail_title_short, args.breedName).allCaps()
+                        }
+                    )
 
-                val contentList = remember { mutableStateListOf<Content>() }
-                contentList.addAll(vm.breedImageListState)
+                    val contentList = remember { mutableStateListOf<Content>() }
+                    contentList.addAll(vm.breedImageListState)
 
-                /** Doggo Images **/
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(16.dp)
-                ){
-                    items(contentList) { contentItem ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                        ) {
-                            Image(
-                                painter = rememberImagePainter(
-                                    data = contentItem.imageUrl,
-                                    builder = {
-                                        crossfade(true)
-                                    }
-                                ),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-
-                            Column(
+                    /** Doggo Images **/
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(16.dp)
+                    ){
+                        items(contentList) { contentItem ->
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .align(Alignment.BottomCenter)
-                                    .background(colorResource(R.color.white_40))
+                                    .height(300.dp)
+                                    .padding(10.dp)
+                                    .clip(RoundedCornerShape(18.dp))
                             ) {
-                                Text(
-                                    text = contentItem.dogName,
-                                    color = colorResource(R.color.card_border),
+                                Image(
+                                    painter = rememberImagePainter(
+                                        data = contentItem.imageUrl,
+                                        builder = {
+                                            crossfade(true)
+                                        }
+                                    ),
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(0.dp, 5.dp, 0.dp, 10.dp),
-                                    style = MaterialTheme.typography.h2,
-                                    textAlign = TextAlign.Center
-                                )
+                                        .align(Alignment.BottomCenter)
+                                        .background(colorResource(R.color.white_40))
+                                ) {
+                                    Text(
+                                        text = contentItem.dogName,
+                                        color = colorResource(R.color.card_border),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(0.dp, 5.dp, 0.dp, 10.dp),
+                                        style = MaterialTheme.typography.h2,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
     }
 }
 

@@ -43,6 +43,10 @@ class DashboardViewModel @Inject constructor(
     var subBreedListState by mutableStateOf(listOf<Breed>())
         private set
 
+    /** Network warning popup should seen once **/
+    var isNetworkWarningDialogVisible by mutableStateOf(true)
+        private set
+
     init {
         Timber.d("DashboardViewModel created..")
         getBreedList()
@@ -54,6 +58,7 @@ class DashboardViewModel @Inject constructor(
 
     fun selectBreed(breedName: String){
         if(breedName != selectedBreedName){
+            Timber.d("Breed selected -> $breedName")
             selectedBreedName = breedName
 
             selectedSubBreedName = ""       // clear sub breed selection
@@ -64,8 +69,26 @@ class DashboardViewModel @Inject constructor(
     fun selectSubBreed(subBreedName: String){
         selectedSubBreedName = subBreedName
     }
+    fun networkWarningSeen(){
+        isNetworkWarningDialogVisible = false
+    }
 
-    private fun getBreedList() {
+    fun validate(): Boolean{
+        if(selectedBreedName.isNotBlank()){
+            if(subBreedListState.isNotEmpty()){
+                if(selectedSubBreedName.isNotBlank()){
+                    return true
+                }
+            }else{
+                return true
+            }
+        }
+
+        return false
+    }
+
+    fun getBreedList() {
+        Timber.d("DashboardViewModel:: getBreedList called")
         if(breedListState.isEmpty()){
             viewModelScope.launch(coroutineContext.IO) {
                 doggoRepository.getBreedList().collect { networkResponse ->
@@ -80,8 +103,11 @@ class DashboardViewModel @Inject constructor(
                             networkResponse.data?.let {
                                 it.message.keys.map { item -> Breed(item) } // service response mapped Breed object
                                     .apply {
+                                        Timber.d("Breed list fetched size:-> $size")
                                         // saves fetched data to room db
+                                        Timber.d("Breed list saved on th e ROOM DB")
                                         breedDao.insertBreed(convertToBreedListEntity())
+                                        Timber.d("Breed list send as a state to UI")
                                         breedListState = this
                                     }
                             }
@@ -93,6 +119,7 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun getSubBreedList(breed: String) {
+        Timber.d("DashboardViewModel:: getSubBreedList called")
         viewModelScope.launch(coroutineContext.IO) {
             doggoRepository.getSubBreedList(breed).collect { networkResponse ->
                 when(networkResponse){
@@ -105,8 +132,11 @@ class DashboardViewModel @Inject constructor(
                     is NetworkResponse.Success -> {
                         networkResponse.data?.let {
                             it.message.map { item -> Breed(item)}.apply {
+                                Timber.d("Sub Breed list fetched size:-> $size")
                                 // saves fetched data to room db
+                                Timber.d("Sub Breed list saved on ROOM DB")
                                 subBreedDao.insertSubBreed(convertToSubBreedListEntity(ownerBreed = breed))
+                                Timber.d("Sub Breed list send as a state to UI")
                                 subBreedListState = this
                             }
                         }
