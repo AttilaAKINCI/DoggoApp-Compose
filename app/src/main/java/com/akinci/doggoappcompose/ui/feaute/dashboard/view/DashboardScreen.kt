@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,11 +42,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel(),
-    onNavigateToDetail: (String, String) -> Unit
+    onNavigateToDetail: (String, String) -> Unit,
+    animationCount:Int = Int.MAX_VALUE    // Added for compose ui tests.. Lottie is blocking UI for infinite animation.
 ){
     DashboardScreenBody(
         vm = viewModel,
-        onNavigateToDetail = onNavigateToDetail
+        onNavigateToDetail = onNavigateToDetail,
+        animationCount = animationCount
     )
 }
 
@@ -56,7 +59,8 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreenBody(
     vm: DashboardViewModel,
-    onNavigateToDetail: (String, String) -> Unit
+    onNavigateToDetail: (String, String) -> Unit,
+    animationCount: Int
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -105,7 +109,7 @@ private fun DashboardScreenBody(
                             modifier = Modifier
                                 .width(100.dp)
                                 .height(100.dp),
-                            iterations = Int.MAX_VALUE
+                            iterations = animationCount
                         )
 
                         Text(
@@ -152,6 +156,7 @@ private fun DashboardScreenBody(
                         modifier = Modifier
                             .align(alignment = Alignment.BottomEnd)
                             .padding(0.dp, 0.dp, 30.dp, 50.dp)
+                            .testTag("floatingButton")
                     ) {
                         Icon(
                             Icons.Filled.KeyboardArrowRight,

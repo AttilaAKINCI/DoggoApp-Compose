@@ -118,6 +118,7 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
     kaptTest "com.google.dagger:hilt-android-compiler:$hilt_version"
     testAnnotationProcessor "com.google.dagger:hilt-android-compiler:$hilt_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.0.5"
 
     androidTestImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
@@ -130,6 +131,11 @@ dependencies {
     androidTestAnnotationProcessor "com.google.dagger:hilt-android-compiler:$hilt_version"
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    androidTestImplementation "androidx.test:core:1.4.0"
+    androidTestImplementation "androidx.test:runner:1.4.0"
+    androidTestImplementation "androidx.test:rules:1.4.0"
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.3"
+    androidTestImplementation "com.google.dagger:hilt-android:$hilt_version"
 
 }
 
