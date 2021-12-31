@@ -7,6 +7,8 @@
 
     <string name="image_view_content_desc">Image View Content Description</string>
     <string name="button_content_desc">Button Content Description</string>
+    <string name="generic_error_msg">Unexpected Error....</string>
+    <string name="list_loading_msg">List loading....</string>
 
     <string name="cd_back">Back</string>
 

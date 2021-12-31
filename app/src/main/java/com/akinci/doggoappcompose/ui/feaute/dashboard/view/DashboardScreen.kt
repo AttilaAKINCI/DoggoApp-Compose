@@ -1,6 +1,5 @@
 package com.akinci.doggoappcompose.ui.feaute.dashboard.view
 
-import android.content.res.Resources
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -28,6 +27,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.ui.components.list.breed.BreedSelector
 import com.akinci.doggoappcompose.ui.components.DoggoAppBar
+import com.akinci.doggoappcompose.ui.components.Informer
 import com.akinci.doggoappcompose.ui.components.NetworkCheckScreen
 import com.akinci.doggoappcompose.ui.components.TiledBackground
 import com.akinci.doggoappcompose.ui.feaute.dashboard.viewmodel.DashboardViewModel
@@ -160,6 +160,18 @@ private fun DashboardScreenBody(
                             tint = colorResource(R.color.white)
                         )
                     }
+
+                    Informer(
+                        uiState = vm.informer,
+                        showSnackBar = {
+                            scope.launch {
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message = it,
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    )
                 }
             }
         }

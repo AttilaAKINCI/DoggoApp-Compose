@@ -1,13 +1,12 @@
 package com.akinci.doggoappcompose.ui.feaute.dashboard.viewmodel
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akinci.doggoappcompose.common.coroutine.CoroutineContextProvider
-import com.akinci.doggoappcompose.common.helper.state.ListState
+import com.akinci.doggoappcompose.common.helper.state.UIState
 import com.akinci.doggoappcompose.common.network.NetworkChecker
 import com.akinci.doggoappcompose.common.network.NetworkResponse
 import com.akinci.doggoappcompose.data.local.dao.BreedDao
@@ -17,10 +16,10 @@ import com.akinci.doggoappcompose.data.mapper.convertToSubBreedListEntity
 import com.akinci.doggoappcompose.data.repository.DoggoRepository
 import com.akinci.doggoappcompose.ui.feaute.dashboard.data.Breed
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,8 +28,7 @@ class DashboardViewModel @Inject constructor(
     private val coroutineContext: CoroutineContextProvider,
     private val doggoRepository: DoggoRepository,
     private val breedDao: BreedDao,
-    private val subBreedDao: SubBreedDao,
-    val networkChecker: NetworkChecker
+    private val subBreedDao: SubBreedDao
 ): ViewModel() {
 
     var selectedBreedName: String = ""
@@ -47,14 +45,14 @@ class DashboardViewModel @Inject constructor(
     var isNetworkWarningDialogVisible by mutableStateOf(true)
         private set
 
+    var informer by mutableStateOf<UIState>(UIState.None)
+        private set
+
+
     init {
         Timber.d("DashboardViewModel created..")
         getBreedList()
     }
-
-    /** works like send and forget **/
-//    private var _uiState = MutableStateFlow<UIState>(UIState.None)
-//    var uiState: StateFlow<UIState> = _uiState
 
     fun selectBreed(breedName: String){
         if(breedName != selectedBreedName){
@@ -94,10 +92,12 @@ class DashboardViewModel @Inject constructor(
                 doggoRepository.getBreedList().collect { networkResponse ->
                     when(networkResponse){
                         is NetworkResponse.Loading -> {
-                           // _breedListData.emit(ListState.OnLoading)
+                            Timber.d("DashboardViewModel:: Breed list loading..")
+                            withContext(this@DashboardViewModel.coroutineContext.Main) { informer = UIState.OnLoading }
                         }
                         is NetworkResponse.Error -> {
-                        //    _uiState.emit(UIState.OnServiceError)
+                            Timber.d("DashboardViewModel:: Breed list service error..")
+                            withContext(this@DashboardViewModel.coroutineContext.Main) { informer = UIState.OnServiceError }
                         }
                         is NetworkResponse.Success -> {
                             networkResponse.data?.let {
@@ -124,10 +124,12 @@ class DashboardViewModel @Inject constructor(
             doggoRepository.getSubBreedList(breed).collect { networkResponse ->
                 when(networkResponse){
                     is NetworkResponse.Loading -> {
-                        //_subBreedListData.emit(ListState.OnLoading)
+                        Timber.d("DashboardViewModel:: Sub Breed list loading..")
+                        withContext(this@DashboardViewModel.coroutineContext.Main) { informer = UIState.OnLoading }
                     }
                     is NetworkResponse.Error -> {
-                    //    _uiState.emit(UIState.OnServiceError)
+                        Timber.d("DashboardViewModel:: Sub Breed list service error..")
+                        withContext(this@DashboardViewModel.coroutineContext.Main) { informer = UIState.OnServiceError }
                     }
                     is NetworkResponse.Success -> {
                         networkResponse.data?.let {

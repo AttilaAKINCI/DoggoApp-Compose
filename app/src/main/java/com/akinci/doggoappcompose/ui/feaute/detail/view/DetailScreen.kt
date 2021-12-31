@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +23,7 @@ import coil.compose.rememberImagePainter
 import com.akinci.doggoappcompose.R
 import com.akinci.doggoappcompose.common.helper.allCaps
 import com.akinci.doggoappcompose.ui.components.DoggoAppBar
+import com.akinci.doggoappcompose.ui.components.Informer
 import com.akinci.doggoappcompose.ui.components.NetworkCheckScreen
 import com.akinci.doggoappcompose.ui.components.TiledBackground
 import com.akinci.doggoappcompose.ui.components.list.header.ListHeader
@@ -58,9 +57,11 @@ fun DetailScreenBody(
     vm: DetailViewModel,
     onBackPress : ()->Unit
 ) {
+    val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             DoggoAppBar(
                 title = stringResource(R.string.title_detail),
@@ -144,6 +145,19 @@ fun DetailScreenBody(
                         }
                     }
                 }
+
+                Informer(
+                    uiState = vm.informer,
+                    showSnackBar = {
+                        scope.launch {
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message = it,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                )
+
             }
         }
     }

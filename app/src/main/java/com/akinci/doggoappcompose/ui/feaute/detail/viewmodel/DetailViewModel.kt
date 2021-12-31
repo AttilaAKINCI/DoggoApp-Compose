@@ -7,21 +7,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akinci.doggoappcompose.common.coroutine.CoroutineContextProvider
-import com.akinci.doggoappcompose.common.network.NetworkResponse
-import com.akinci.doggoappcompose.common.helper.state.ListState
 import com.akinci.doggoappcompose.common.helper.state.UIState
+import com.akinci.doggoappcompose.common.network.NetworkResponse
 import com.akinci.doggoappcompose.data.local.dao.ContentDao
 import com.akinci.doggoappcompose.data.mapper.convertToDoggoContentListEntity
 import com.akinci.doggoappcompose.data.repository.DoggoRepository
-import com.akinci.doggoappcompose.ui.feaute.dashboard.data.Breed
 import com.akinci.doggoappcompose.ui.feaute.detail.data.Content
 import com.akinci.doggoappcompose.ui.feaute.detail.helper.DoggoNameProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,6 +41,9 @@ class DetailViewModel @Inject constructor(
     var isNetworkWarningDialogVisible by mutableStateOf(true)
         private set
 
+    var informer by mutableStateOf<UIState>(UIState.None)
+        private set
+
     fun networkWarningSeen(){
         isNetworkWarningDialogVisible = false
     }
@@ -51,22 +51,20 @@ class DetailViewModel @Inject constructor(
     init {
         Timber.d("DetailViewModel created..")
 
-        getDoggoContent(fragmentArgBreed, fragmentArgSubBreed)
+        getDoggoContent(fragmentArgBreed, fragmentArgSubBreed, count = 15)
     }
 
-    /** works like send and forget **/
-    private var _uiState = MutableStateFlow<UIState>(UIState.None)
-    var uiState: StateFlow<UIState> = _uiState
-
-    fun getDoggoContent(breed: String, subBreed: String = "", count: Int = (10..30).random()) {
+    fun getDoggoContent(breed: String, subBreed: String = "", count :Int) {
         viewModelScope.launch(coroutineContext.IO) {
             doggoRepository.getDoggoContent(breed = breed, subBreed = subBreed, count = count).collect { networkResponse ->
                 when(networkResponse){
                     is NetworkResponse.Loading -> {
-                        //_breedImageListData.emit(ListState.OnLoading)
+                        Timber.d("DetailViewModel:: Doggo content list loading..")
+                        withContext(this@DetailViewModel.coroutineContext.Main) { informer = UIState.OnLoading }
                     }
                     is NetworkResponse.Error -> {
-                    //    _uiState.emit(UIState.OnServiceError)
+                        Timber.d("DetailViewModel:: Doggo content service error..")
+                        withContext(this@DetailViewModel.coroutineContext.Main) { informer = UIState.OnServiceError }
                     }
                     is NetworkResponse.Success -> {
                         networkResponse.data?.message?.let {
