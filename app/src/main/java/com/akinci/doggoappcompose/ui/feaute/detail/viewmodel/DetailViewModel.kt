@@ -3,6 +3,7 @@ package com.akinci.doggoappcompose.ui.feaute.detail.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akinci.doggoappcompose.common.coroutine.CoroutineContextProvider
@@ -28,25 +29,26 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(
     private val coroutineContext: CoroutineContextProvider,
     private val doggoRepository: DoggoRepository,
-    private val contentDao: ContentDao
+    private val contentDao: ContentDao,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     // pass data to composable ui via states
     var breedImageListState by mutableStateOf(listOf<Content>())
         private set
 
+    private val fragmentArgBreed by lazy { savedStateHandle.get("breed") ?: "" }
+    private val fragmentArgSubBreed by lazy { savedStateHandle.get("subBreed") ?: "" }
 
-    /** Fragments are driven with states **/
-    private var _breedImageListData = MutableStateFlow<ListState<List<String>>>(ListState.None)
-    var breedImageListData: StateFlow<ListState<List<String>>> = _breedImageListData
+    init {
+        Timber.d("DetailViewModel created..")
+
+        getDoggoContent(fragmentArgBreed, fragmentArgSubBreed)
+    }
 
     /** works like send and forget **/
     private var _uiState = MutableStateFlow<UIState>(UIState.None)
     var uiState: StateFlow<UIState> = _uiState
-
-    init {
-        Timber.d("DetailViewModel created..")
-    }
 
     fun getDoggoContent(breed: String, subBreed: String = "", count: Int = (10..30).random()) {
         viewModelScope.launch(coroutineContext.IO) {
@@ -59,12 +61,13 @@ class DetailViewModel @Inject constructor(
                     //    _uiState.emit(UIState.OnServiceError)
                     }
                     is NetworkResponse.Success -> {
-                       // delay(3000L) // in order to simulate network delay. show shimmer
-
                         networkResponse.data?.message?.let {
+                            Timber.d("DetailViewModel:: Doggo content fetched..")
                             // saves fetched data to room db
+                            Timber.d("DetailViewModel:: Doggo content is written to ROOM DB")
                             contentDao.insertContent(contentList = it.convertToDoggoContentListEntity(breed = breed, subBreed = subBreed))
-                            // _breedImageListData.emit(ListState.OnData(this))
+
+                            Timber.d("DetailViewModel:: Doggo content is send as a state to UI")
                             breedImageListState = it.map { imageUrl ->
                                 Content(
                                     imageUrl = imageUrl,

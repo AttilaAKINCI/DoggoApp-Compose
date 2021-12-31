@@ -43,10 +43,6 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
     onBackPress: () -> Unit
 ){
-    LaunchedEffect(true) {
-        viewModel.getDoggoContent(args.breedName, args.subBreedName)
-    }
-
     DetailScreenBody(
         args = args,
         vm = viewModel,
