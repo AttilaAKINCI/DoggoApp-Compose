@@ -21,6 +21,7 @@ src="https://user-images.githubusercontent.com/21987335/147821026-9a780384-d1a4-
     - Repository pattern for data management
 * JetPack Libs
     - Compose
+    - Compose UI testing
 * Retrofit
 * Kotlin & Coroutines
 * Room Database 
